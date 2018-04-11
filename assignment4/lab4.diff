@@ -1,0 +1,33 @@
+2018-02-08  Stefanie Shidoosh  <classesh@lnxsrv07.seas.ucla.edu>
+
+	* This patch corrects timespec.h in coreutils, preventing overflow by bypassing evaluation
+	        and instead returning positive, negative, or a value of zero for comparison result.
+
+--- coreutils-with-bug/lib/timespec.h	2018-02-08 21:01:01.558443000 -0800
++++ timespec.h	2018-02-08 20:58:55.787805000 -0800
+@@ -45,8 +45,23 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  if(a.tv_sec > b.tv_sec) {
++	return 1;
++	} 
++  if(a.tv_sec < b.tv_sec) {
++	return -1; 
++	} 
++  else {
++	if (a.tv_nsec > b.tv_nsec) {     
++        	return 1;
++        }
++  	if(a.tv_nsec < b.tv_nsec) {
++        	return -1;
++        }
++	else
++		return 0; 
++	}	//int diff = a.tv_sec - b.tv_sec;
++  //return diff ? diff : a.tv_nsec - b.tv_nsec;
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

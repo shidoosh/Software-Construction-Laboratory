@@ -1,0 +1,50 @@
+Name: Stefanie Shidoosh
+UID: 804794484 
+
+Q1. Why did Brady's patch remove the line "case_long_iso_time_style:"? 
+Was it necessary to remove that line? Explain.
+	The line in the siwtch statement was removed because it 
+	was a goto, therefore not usefyl. Additionally, it was redundant 
+	as it was listed twice, thus the control flow 
+	would consider it in the subsequent case. 
+	It was not necessarily necessary to remove it, 
+	but ultimately increases the readability of the code. 
+
+Q2. If your company adopts this 
+patched version of Coreutils instead of the default one, 
+what else should you watch out for? 
+Might this new version of Coreutils 
+introduce other problems with your application, perhaps 
+in countries where users don't speak English 
+and don't understand English-format dates?
+	One aspect of the patch the company would want to watch out for 
+	is the significance of finding the last time (as in hour:minute) 
+	for files older than a year, considering this patch does
+	not show such information with the ls -l command. 
+	This version is very much American and English specific, which causes
+	problems for users who are not accustomed to American date formatting 
+	and English name. Say, many other countries note the date 
+	like the pre-patched version. Moreover, and even more troublesome, 
+	non-English speakers would encounter a translation barrier 
+	when simply just trying to find the last modified date. 
+
+Q3. What happens when this script is invoked 
+on an empty file like /dev/null, and why?
+	The error IndexError: list index out of range outputs. 
+	This is because when the random.choice() is invoked, 
+	the seq argument passed (lines of passed file) is empty. 
+	The error raise is explicitly defined in File 
+	"/usr/local/cs/Python-2.7.14/lib/python2.7/random.py", 
+	line 277, in choice
+    	return seq[int(self.random() * len(seq))]  
+	# raises IndexError if seq is empty
+	
+Q4. What happens when this script is invoked
+with Python 3 rather than Python 2, and why?
+	The error except IOError as (errno, strerror):
+        	              ^
+	SyntaxError: invalid syntax outputs
+	This is because python3 does not support IOError, 
+	instead merging it with OSError. 
+	In other words, python3 incorporates the IOError 
+	into definition of OSError. 	

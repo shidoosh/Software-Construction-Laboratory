@@ -1,0 +1,10 @@
+#!/bin/bash
+grep "<\td>"|	    				#find all lines with english or hawaiian words
+sed 's/<[^>]*>//g'| 				#delete all html tags
+sed '1~2d'|					#delete every other line
+tr [:upper:] [:lower:] |			#change all upper case to lowercase
+tr '\`' "\'" |					#change ` to '
+tr -s '[,[:space:]]' '\n' |		        #replace comma followed by a space with newline
+sed '/^\s*$/d' |				#delete empty lines  
+tr -cs "pk\'mnwlhaeiou" '[\n*]' |  		#guarantees hawaiian orthography
+sort -u						#sort, no duplicates

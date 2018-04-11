@@ -1,0 +1,475 @@
+Name: Stefanie Shidoosh
+UID: 804794484
+
+I used lnxsrv07 on a remote seas net machine to answer the following questions. 
+
+
+1. What shell command uses the man program to print all the commands 
+that have a specific word in their man page (or at least the description part of the man page)? (hint: man man)
+
+The shell command apropos.
+In options section of man (using man man to see):
+   $ man man 
+	…in OPTIONS…
+-k, --apropos
+              Equivalent to apropos.  Search the short  manual  page  descrip‐
+              tions  for keywords and display any matches.  See apropos(1) for
+              details.
+So I checked the See Also section of man and apropos was there too. 
+Using man apropos, under description section: 
+   $ man apropos
+       Each manual page has a short description available within it.   apropos
+       searches the descriptions for instances of keyword.
+
+2. Where are the cp and wc programs located in the file system? 
+List any shell commands you used to answer this question.
+   $ whereis cp
+	/usr/local/cs/bin/cp 
+   $ whereis wc 
+	/usr/local/cs/bin/wc 
+
+3. What executable programs have names that are just one character long, and what do they do?
+ List any shell commands you used to answer this question.
+   $ find /usr/bin -name '?' -executable
+	/usr/bin/[
+	/usr/bin/w
+	/usr/bin/X
+
+   $ man w
+       w - Show who is logged on and what they are doing.
+   $ man X
+	Nothing showed up. So I tried wh.. commands. 
+   $ whatis X
+	Still nothing. Tried using the older server lnxsrv02, and ran man X again. 
+   $ man X
+	X - a portable, network-transparent window system
+     The problem was that X was a symbolic link to Xorg. man Xorg on lnxsrv07 produced same result as man X on lnxsrv02.
+   $ man [ 
+	Specifies a bash built-in command, used for conditional flow, 
+        considering the commands listed in the description (true, false, break, continue, exit). 
+
+4. When you execute the command named by the symbolic link /usr/bin/emacs, 
+which file actually is executed? List any shell commands you used to answer this question.
+   $ readlink /usr/bin/emacs		a symbolic link
+	/etc/alternatives/emacs 
+   $ readlink /etc/alternatives/emacs	also a symbolic link
+        /usr/bin/emacs-24.3
+   $ readlink /usr/bin/emacs-24.3          real file. 
+	
+		/usr/bin/emacs executes /etc/alternatives/emacs which executes /usr/bin/emacs-24.3 . 
+
+5. The chmod program changes permissions on a file. 
+What does the symbolic mode g+s,o-x mean, in terms of permissions?
+$ man chmod
+	…In DESCRIPTION…
+	g: the permissions granted to other users who are members of the file's  group  
+	+: causes the selected file mode bits to be added to the existing file  mode  bits  of  each  file
+	s: set user or group ID on execution 
+	o: other users not in file’s group or owners 
+	-: causes selected mode bits to be removed
+	x: execute  (or  search  for directories)  
+
+	So, 
+		g+s: set ID of the group of users granted permission on file 
+		o-x: remove permissions for the members specified by o option. 
+
+
+6. What option to find lets you search for files that have been modified in the last three weeks?
+   $ man find 
+	…In EXPRESSIONS…
+	…In OPTIONS…
+   -mtime n
+              File's data was last modified n*24 hours ago.  See the comments  for  -atime  to  understand  how 
+              rounding affects the interpretation of file modification times.
+
+   	So, to find files last modified in last weeks, n = 21, with - (to find WITHIN last 21*24 hours). 
+
+7. Use the previous answer to find all directories modified in the last three weeks. 
+List any shell commands you used to answer this question.
+	…In home directory… 
+   $ find . -type d -mtime -21
+./Desktop
+./Desktop/$RECYCLE.BIN
+./Documents
+./Documents/$RECYCLE.BIN
+./Downloads
+./Downloads/$RECYCLE.BIN
+./.cache/abrt
+8. Of the files in the same directory as find, how many of them are symbolic links? 
+List any shell commands you used to answer this question.
+246 symbolic links. 
+$ whereis find 
+	find: /usr/bin/find /usr/share/man/man1/find.1.gz /usr/share/man/	man1p/find.1p.gz
+	Directory is /usr/bin/
+$ find /usr/bin -type l
+/usr/bin/dvired
+/usr/bin/etags
+/usr/bin/psfaddtable
+/usr/bin/pdfjadetex
+/usr/bin/open
+/usr/bin/texhash
+/usr/bin/captoinfo
+/usr/bin/unxz
+/usr/bin/pmiostat
+/usr/bin/bzcat
+/usr/bin/apropos
+/usr/bin/xzegrep
+/usr/bin/lpq
+/usr/bin/etex
+/usr/bin/xjc
+/usr/bin/javaws
+/usr/bin/gsoelim
+/usr/bin/texlinks
+/usr/bin/hwloc-ls
+/usr/bin/rmic
+/usr/bin/lpr
+/usr/bin/pdfxmltex
+/usr/bin/slogin
+/usr/bin/lpstat
+/usr/bin/kdesu
+/usr/bin/kpsewhere
+/usr/bin/systemd-loginctl
+/usr/bin/allneeded
+/usr/bin/gjs
+/usr/bin/keytool
+/usr/bin/thumbpdf
+/usr/bin/jcmd
+/usr/bin/extractbb
+/usr/bin/wish
+/usr/bin/texconfig
+/usr/bin/htmex
+/usr/bin/mailq.postfix
+/usr/bin/pdflatex
+/usr/bin/appletviewer
+/usr/bin/iptables-xml
+/usr/bin/nfs4_editfacl
+/usr/bin/jjs
+/usr/bin/lastb
+/usr/bin/gtroff
+/usr/bin/serialver
+/usr/bin/jar
+/usr/bin/xzcat
+/usr/bin/libpng-config
+/usr/bin/db2pdf
+/usr/bin/gimp-console
+/usr/bin/dvilualatex
+/usr/bin/allcm
+/usr/bin/vimdiff
+/usr/bin/texluac
+/usr/bin/idlj
+/usr/bin/xzcmp
+/usr/bin/httex
+/usr/bin/gmake
+/usr/bin/awk
+/usr/bin/mktexfmt
+/usr/bin/javac
+/usr/bin/sudoedit
+/usr/bin/mailq.sendmail
+/usr/bin/nc
+/usr/bin/dvipdfm
+/usr/bin/atq
+/usr/bin/fmtutil-sys
+/usr/bin/gpgv
+/usr/bin/db2dvi
+/usr/bin/combinediff
+/usr/bin/unix2mac
+/usr/bin/ld
+/usr/bin/pdfetex
+/usr/bin/bashbug
+/usr/bin/orbd
+/usr/bin/hoststat
+/usr/bin/ksh
+/usr/bin/db2ps
+/usr/bin/jconsole
+/usr/bin/sg
+/usr/bin/initex
+/usr/bin/policytool
+/usr/bin/bzless
+/usr/bin/x86_64
+/usr/bin/rksh
+/usr/bin/lprm
+/usr/bin/mailq
+/usr/bin/pmevent
+/usr/bin/simpdftex
+/usr/bin/wsimport
+/usr/bin/extcheck
+/usr/bin/jhat
+/usr/bin/paplay
+/usr/bin/java
+/usr/bin/htxelatex
+/usr/bin/rview
+/usr/bin/rmid
+/usr/bin/rmail
+/usr/bin/mac2unix
+/usr/bin/python2-config
+/usr/bin/cancel
+/usr/bin/jdb
+/usr/bin/bzcmp
+/usr/bin/pax
+/usr/bin/rvim
+/usr/bin/pack200
+/usr/bin/jade
+/usr/bin/gpic
+/usr/bin/traceroute6
+/usr/bin/fmtutil
+/usr/bin/infotocap
+/usr/bin/javah
+/usr/bin/jrunscript
+/usr/bin/desktop-file-edit
+/usr/bin/passwd
+/usr/bin/nmtui-connect
+/usr/bin/readcd
+/usr/bin/reset
+/usr/bin/javadoc
+/usr/bin/psfstriptable
+/usr/bin/inimf
+/usr/bin/ht
+/usr/bin/jadetex
+/usr/bin/python
+/usr/bin/kpsexpand
+/usr/bin/emacs
+/usr/bin/setup
+/usr/bin/updmap
+/usr/bin/newaliases.postfix
+/usr/bin/schemagen
+/usr/bin/ex
+/usr/bin/texconfig-dialog
+/usr/bin/python-config
+/usr/bin/python2
+/usr/bin/bunzip2
+/usr/bin/allec
+/usr/bin/kpsepath
+/usr/bin/nail
+/usr/bin/mkisofs
+/usr/bin/htcontext
+/usr/bin/unpack200
+/usr/bin/dviluatex
+/usr/bin/servertool
+/usr/bin/newaliases.sendmail
+/usr/bin/jstat
+/usr/bin/systemd-coredumpctl
+/usr/bin/pamon
+/usr/bin/rvi
+/usr/bin/jsadebugd
+/usr/bin/rhn_register
+/usr/bin/htxetex
+/usr/bin/view
+/usr/bin/psfgettable
+/usr/bin/dvdrecord
+/usr/bin/xzfgrep
+/usr/bin/nisdomainname
+/usr/bin/mail
+/usr/bin/grepdiff
+/usr/bin/sh
+/usr/bin/newaliases
+/usr/bin/gpg
+/usr/bin/nsgmls
+/usr/bin/ypdomainname
+/usr/bin/spent
+/usr/bin/texlua
+/usr/bin/makemap
+/usr/bin/kpsetool
+/usr/bin/setup-nsssysinit
+/usr/bin/f95
+/usr/bin/dvi2fax
+/usr/bin/phar
+/usr/bin/pmcollectl
+/usr/bin/flipdiff
+/usr/bin/atrm
+/usr/bin/flex++
+/usr/bin/mk4ht
+/usr/bin/lex
+/usr/bin/jstack
+/usr/bin/geqn
+/usr/bin/xmltex
+/usr/bin/rnano
+/usr/bin/latex
+/usr/bin/linux32
+/usr/bin/parec
+/usr/bin/i386
+/usr/bin/mkhybrid
+/usr/bin/sgmlnorm
+/usr/bin/rpmquery
+/usr/bin/htlatex
+/usr/bin/mptopdf
+/usr/bin/chsh
+/usr/bin/rpmverify
+/usr/bin/X
+/usr/bin/sgml2xml
+/usr/bin/ghostscript
+/usr/bin/byacc
+/usr/bin/ping6
+/usr/bin/nmtui-hostname
+/usr/bin/links
+/usr/bin/gtbl
+/usr/bin/lualatex
+/usr/bin/latrace-ctl
+/usr/bin/rmiregistry
+/usr/bin/lsdiff
+/usr/bin/jmap
+/usr/bin/gnroff
+/usr/bin/pstree.x11
+/usr/bin/db2rtf
+/usr/bin/dnsdomainname
+/usr/bin/tclsh
+/usr/bin/texconfig-sys
+/usr/bin/jarsigner
+/usr/bin/mysql_config
+/usr/bin/csh
+/usr/bin/tnameserv
+/usr/bin/spam
+/usr/bin/pmatop
+/usr/bin/updmap-sys
+/usr/bin/gneqn
+/usr/bin/gimp
+/usr/bin/pstack
+/usr/bin/zsoelim
+/usr/bin/jinfo
+/usr/bin/domainname
+/usr/bin/gnome-keyring
+/usr/bin/subscription-manager
+/usr/bin/httexi
+/usr/bin/native2ascii
+/usr/bin/javap
+/usr/bin/gtar
+/usr/bin/nmtui-edit
+/usr/bin/arecord
+/usr/bin/lp
+/usr/bin/jstatd
+/usr/bin/jps
+/usr/bin/ebb
+/usr/bin/mkluatexfontdb
+/usr/bin/cdrecord
+/usr/bin/purgestat
+/usr/bin/Mail
+/usr/bin/wsgen
+/usr/bin/cc
+/usr/bin/parecord
+/usr/bin/linux64
+/usr/bin/apt
+/usr/bin/makeinfo
+
+9. What is the oldest regular file in the /usr/lib directory? Use the last-modified time to determine age. 
+Include files (with names starting with ".") in your search. List any shell commands you used to answer this question.
+The only way I know how to show a hidden file (ones that start with ‘.’) is with -a option of ls.
+ To find out last-modified file using ls: 
+   $ man ls
+…In DESCRIPTION…
+-t     sort by modification time, newest first
+-u     with  -lt:  sort  by, and show, access time; with -l: show access time and sort by name; otherwise: sort by
+              access time
+$ cd /usr/lib
+$ ls -a  -l -t
+Jan 26  2014 libgpg-error.so.0.10.0 is the oldest file. 
+
+10. Where does the locale command get its data from? 
+List any shell commands you used to answer this question.
+Locale gets it’s data from environmental variables that controls the locale. 
+   $ man locale
+	…In DESCRIPTION…
+        locale  displays  the  current  locale  settings for each locale category (see locale(5)), 
+        based on the settings of the environment variables that control the locale  (see  locale(7))
+
+11. In Emacs, what commands have sort in their name? List any Emacs commands you used to answer this question.
+   $ emacs
+   $ C-h 
+   $ a
+   $ sort
+   $ Enter
+Buffer-menu-sort              
+   Sort Tabulated List entries by the column at point.
+sort-columns                 
+   Sort lines in region alphabetically by a certain range of columns.
+sort-fields                
+   Sort lines in region lexicographically by the ARGth field of each
+   line.
+sort-lines              
+   Sort lines in region alphabetically; argument means descending
+   order.
+sort-numeric-fields     
+   Sort lines in region numerically by the ARGth field of each line.
+sort-pages      
+   Sort pages in region alphabetically; argument means descending
+   order.
+sort-paragraphs          
+   Sort paragraphs in region alphabetically; argument means descending
+   order.
+sort-regexp-fields        
+   Sort the text in the region region lexicographically.
+tabulated-list-col-sort      
+   Sort Tabulated List entries by the column of the mouse click E.
+tabulated-list-sort     
+   Sort Tabulated List entries by the column at point.
+12. Briefly, what do the Emacs keystrokes C-M-a through C-M-h do? 
+Can you list their actions concisely? 
+List any Emacs commands you used to answer this question.
+   $ emacs
+Emacs Commands:
+C-h r
+Enter on Key Index
+* C-M-a:                                 Move to beginning of current or preceding defun
+* C-M-b:                                 Move backward over a balanced expression (backward-sexp). 
+* C-M-c:                                 Exiting the recursive edit
+* C-M-d:                                 Move down in parenthesis structure (down-list).
+* C-M-d (Dired):                         Go down in the directory tree, to the first subdirectory's header line (dired-tree-down).
+* C-M-e:                                 Move to end of current or following defun (end-of-defun). 
+* C-M-f:                                 Move forward over a balanced expression (forward-sexp). 
+* C-M-f (Rmail):                         Makes a partial summary that mentions only the messages whose ‘From’ fields match the 											regular expression senders. (rmail-summary-by-senders) 
+* C-M-h:                                 Put region around whole current or following defun (mark-defun).
+
+Curiously, C-M-g wasn’t listed. 
+So, by inspection by entering C-M-g, emacs outputted “quit.” Thus, C-M-g is a quit command. 
+
+13. In more detail, what does the Emacs keystroke C-g do? 
+List any Emacs commands you used to answer this question.
+	$ emacs
+	C-h r
+	Enter on Key Index
+	Enter on C-g
+	* C-g:      Quit: cancel running or partially typed command.
+
+14. What does the Emacs yank function do? List any Emacs commands you used to answer this question.
+	$ emacs
+	C-h r
+	Enter on Key Index 
+	Enter on C-y
+	* C-y:                                   Yanking
+	Yank the last kill into the buffer, at point (yank).
+	Yanking essentially pastes texts that was killed (cut) prior. 
+        In other words, it pastes what is in the kill region (M-w). 
+
+15. When looking at the directory /usr/bin, what's the difference between the output of the ls -l command, 
+and the directory listing of the Emacs dired command? 
+List any shell or Emacs commands you used to answer this question.
+cd /usr/bin
+ls -l 
+-rwxr-xr-x    1 root root       41496 Jun 30  2016 [
+-rwxr-xr-x    1 root root      107856 Mar  2  2017 a2p
+-rwxr-xr-x    1 root root       52640 Oct  3 06:37 ab
+-rwxr-xr-x    1 root root       11248 May 30  2017 abrt-action-analyze-backtrace
+-rwxr-xr-x    1 root root       15328 May 30  2017 abrt-action-analyze-c
+-rwxr-xr-x    1 root root        1345 May 30  2017 abrt-action-analyze-ccpp-local
+-rwxr-xr-x    1 root root        6821 May 30  2017 abrt-action-analyze-core
+-rwxr-xr-x    1 root root       11224 May 30  2017 abrt-action-analyze-oops
+……and so on.
+
+$ emacs
+C-x d 
+dr-xr-xr-x.   2 root root       69632 Dec 28 13:15 .
+  drwxr-xr-x.  15 root root        4096 Nov 18  2016 ..
+  -rwxr-xr-x    1 root root       41496 Jun 30  2016 [
+  -rwxr-xr-x    1 root root      107856 Mar  2  2017 a2p
+  -rwxr-xr-x    1 root root       52640 Oct  3 06:37 ab
+  -rwxr-xr-x    1 root root       11248 May 30  2017 abrt-action-analyze-backtrace
+  -rwxr-xr-x    1 root root       15328 May 30  2017 abrt-action-analyze-c
+  -rwxr-xr-x    1 root root        1345 May 30  2017 abrt-action-analyze-ccpp-local
+  -rwxr-xr-x    1 root root        6821 May 30  2017 abrt-action-analyze-core
+  -rwxr-xr-x    1 root root       11224 May 30  2017 abrt-action-analyze-oops
+……and so on. 	
+	Using dired, 2 more files are printed relative to the ls -l: 
+		dr-xr-xr-x.   2 root root       69632 Dec 28 13:15 .
+  		drwxr-xr-x.  15 root root        4096 Nov 18  2016 ..
+
+	These files are hidden, as indicated with them starting with a ‘.’. 
+	Considering this, the Emacs dired command is equivalent to the linux shell command ls -l -a. 
+	Thus, the difference the Emacs dired command shows all files, even hidden ones, whereas ls -l (hence, with no -a option) does not. 

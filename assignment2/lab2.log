@@ -1,0 +1,516 @@
+Name: Stefanie Shidoosh
+UID: 804794484
+
+Laboratory: Spell-checking Hawaiian 
+
+	$ export PATH=/usr/local/cs/bin:$PATH
+My remote SEASNET machine was not configured initially to the 	
+standard C. 
+        $ locale
+       		 LC_CTYPE="en_US.UTF-8"
+So I ran the shell command as specified in the spec. 
+	$ export LC_ALL='C'
+This sets the C standard for all LC variables. 
+	$ locale
+	LANG=en_US.UTF-8
+	LC_CTYPE="C"
+	LC_NUMERIC="C"
+	LC_TIME="C"
+	LC_COLLATE="C"
+	LC_MONETARY="C"
+	LC_MESSAGES="C"
+	LC_PAPER="C"
+	LC_NAME="C"
+	LC_ADDRESS="C"
+	LC_TELEPHONE="C"
+	LC_MEASUREMENT="C"
+	LC_IDENTIFICATION="C"
+	LC_ALL=C
+
+To sort the contents of the file /usr/share/dict/words 
+and put into words file, I ran the shell command
+	$ sort /usr/share/dict/words > words
+To take a text file containing the 
+HTML of the assignment's web page,
+I ran the shell command 
+	$ wget https://web.cs.ucla.edu/classes/winter18/cs35L/assign/assign2.html
+What each command outputs: 
+The tr command translates and deletes characters. 
+tr -c 'A-Za-z' '[\n*]' 
+	Takes the complement of the set 'A-Za-z'
+	and replaces it with a newline. 
+tr -cs 'A-Za-z' '[\n*]' 
+	The additional -s option replaces the sequence of 
+	repeated characters in the complement 
+	of 'A-Za-z' set with a single newline. 
+tr -cs 'A-Za-z' '[\n*]' | sort 
+	Sorts the output of tr -cs 'A-Za-z' '[\n*]' 
+	by corresponding ASCII values. 
+tr -cs 'A-Za-z' '[\n*]' | sort -u 
+	Will output the first of an equal run, 
+	thereby discarding duplicate values
+tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words 
+	comm compares two sorted files line by line. 
+	In our case, this command compares the output of 
+	tr -cs 'A-Za-z' '[\n*]' | sort -u < assign2.html
+	with the sorted file /usr/share/dict/words. 
+	3 columns outputted: what is unique to one file, 
+	what is unique to the other file, and what elements they share. 
+tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words < assign2.html
+	-23 suppresses columns 2 and 3, 
+	thus only showing what was unique file1. 
+	That is, what words were misspelled as they did 
+	not match up with words file, hence, 
+	functioning as our makeshift spellchecker. 
+
+To start our Hawaiian spellchecker,
+I used the following shell command to obtain the copy of 
+the webpage as specified in the assignment.  
+	$ wget http://mauimapp.com/moolelo/hwnwdseng.htm
+My script to extract Hawaiian words (buildwords), using approach #2: 
+#!/bin/bash
+grep "<\td>"|		#find all lines with english or hawaiian words
+sed 's/<[^>]*>//g'|     #delete all html tags
+sed '1~2d'|             #delete every other line
+tr [:upper:] [:lower:] | #change all upper case to lowercase
+tr '\`' "\'" |                                  #change ` to '
+sed -e $'s/, /\\\n/g' |  #replace comma followed by a space with newline
+sed '/^\s*$/d' |                                #delete empty lines
+sed 's/^\s*//g' |                               #delete leading spaces  
+tr -cs "pk\'mnwlhaeiou" '[\n*]' |              #guarantees hawaiian orthography
+sort -u   
+
+In order to give executable permissions
+	$ chmod +x buildwords
+Using script to put make crude Hawaiian dictionary: 
+	$ cat htest | ./buildwords > hwords
+Works! :)
+
+Modifying given shell command so that it checks 
+the spelling of Hawaiian rather than English
+	$ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | 
+	sed '/^\s*$/d'|  sort -u | comm -23 - hwords > numberUnmatchedHWords
+	$ cat numberUnmatchedHWords | wc -l 
+We see that there are 405 words listed. 	
+	$ cat assign2.html | tr [:upper:] [:lower:] | tr -cs 'A-Za-z' '[\n*]' | 
+	sed '/^\s*$/d'|  sort -u | comm -23 - words > numberUnmatchedEngWords
+We see that there are 38 words listed. 
+	$ cat numberUnmatchedEngWords | wc -l 
+	$ cat numberUnmatchedEngWords | comm - numberUnmatchedHWords > finalComp
+	$ vim finalComp
+First column: incorrect English spelling, correct Hawaiian spelling
+	ex - halau, lau, wiki
+Second column: incorrect Hawaiian spelling, correct English spelling
+	ex - afterwards, capitalized, happened, occurrence, working
+Third column: incorrect in both English spelling and Hawaiian spelling. 
+	ex - basedefs, buildwords, ctype, doctype, eggert,
+		eword, href, htm, html, http, hwnwdseng, hword, hwords
+...finalComp...
+	a
+	able
+	about
+	above
+	abovementioned
+	accent
+	address
+	after
+	afterwards
+	against
+	all
+	also
+	an
+	and
+	any
+	apostrophe
+	are
+	argument
+	arguments
+	as
+	ascii
+	assign
+	assignment
+	assume
+	assumption
+	attempt
+	automate
+	awk
+	b
+	bar
+		basedefs
+	be
+	before
+	being
+	body
+	br
+	briefly
+	bug
+	bugs
+		buildwords
+	but
+	by
+	c
+	can
+	capitalized
+	carriage
+	case
+	cased
+	cases
+	cat
+	change
+	chap
+	characters
+		charset
+	check
+	checked
+	checker
+	checkers
+	checking
+	checks
+		cmp
+	columns
+	com
+	comm
+	command
+	commands
+	commas
+	contain
+	containing
+	contains
+	content
+	contents
+	convenience
+	copy
+	copying
+	copyright
+	count
+	create
+	crude
+	cs
+		ctype
+	d
+	describe
+	described
+	detail
+	dict
+	dictionary
+	did
+	differs
+	directories
+	directory
+	disk
+	do
+		doctype
+	doesn
+	don
+	down
+	dtd
+	duplicate
+	duplicates
+	each
+		eggert
+	en
+	english
+	entries
+	equiv
+	equivalent
+	equivalents
+	error
+		eword
+	examine
+	example
+	examples
+	exp
+	export
+	extract
+	fetch
+	file
+	files
+	find
+	finds
+	first
+	fix
+	following
+	foo
+	for
+	formatted
+	from
+	generally
+	give
+	given
+	gnu
+	grave
+	gt
+	h
+halau
+	hand
+	handle
+	happened
+	hard
+	has
+	hawaiian
+	head
+	hint
+	homework
+	hosts
+	how
+	however
+	hr
+		href
+		htm
+		html
+		http
+		hwnwdseng
+		hword
+		hwords
+	id
+		idx
+	if
+	ignore
+	immediately
+	implementation
+	improperly
+	in
+	input
+	into
+	introductory
+	is
+	it
+	its
+	itself
+	just
+	k
+	keep
+	l
+	lab
+	laboratory
+	language
+	last
+	later
+lau
+	lc
+	leading
+	length
+	less
+	let
+	letters
+	lexicographically
+	li
+	like
+	line
+	link
+	links
+		linux
+	list
+	ln
+	locale
+	log
+	lots
+	lower
+	lt
+	m
+	mail
+	many
+		mauimapp
+	may
+	mentioned
+	merely
+	meta
+	misspelled
+	modify
+		moolelo
+	more
+	multiple
+	n
+	name
+	named
+	names
+	naming
+		ndash
+	need
+	no
+	non
+	not
+	note
+	notebook
+	nothing
+	number
+	o
+	obtain
+	occurrence
+	of
+		okina
+	on
+	one
+		onlinepubs
+	only
+		opengroup
+	or
+	ordinary
+	org
+	orthography
+	other
+	others
+	output
+	outputs
+	p
+	page
+	particular
+	paul
+	people
+	per
+	performed
+	please
+	portable
+	position
+		posix
+	pre
+	prefer
+	prepared
+	previous
+	problem
+	problems
+	project
+	public
+	pubs
+	putting
+	r
+	rather
+	re
+	read
+	readable
+	reading
+	record
+	recursively
+	regular
+	reject
+	remaining
+	removing
+	repair
+	replace
+	replaces
+	report
+	represent
+	reproduce
+	result
+	resulting
+	results
+	returns
+	right
+	rules
+	run
+	runnable
+	running
+	s
+		sameln
+	samp
+	save
+	script
+	scripting
+		seasnet
+	see
+	share
+	shell
+	should
+	shown
+	silently
+	similarly
+	simple
+	since
+	single
+	so
+	software
+	some
+	sort
+	sorted
+	sorting
+	space
+	spaces
+	special
+	spell
+	spelling
+	standard
+	start
+	steve
+	strict
+	subdirectories
+	submit
+	substitutions
+	such
+	supports
+	suppose
+	sure
+	symbolic
+	system
+	systematic
+	systematically
+	t
+	tables
+	tag
+	take
+	takes
+		td
+	test
+	text
+	than
+	that
+	the
+	their
+	them
+	then
+	there
+	these
+	they
+	thing
+	this
+	title
+	to
+		toc
+	tr
+	traditional
+	transcript
+	treat
+	true
+	two
+	type
+	typed
+	u
+		ul
+	under
+	unique
+	upper
+	use
+	user
+	using
+		usr
+		utf
+	utilities
+	v
+		vandebogart
+	var
+	w
+	want
+	we
+	web
+	were
+		wget
+	what
+	where
+	which
+	whose
+	why
+wiki
+		wikipedia
+	with
+	word
+	words
+	work
+	working
+	worry
+	write
+		www
+	x
+	y
+	you
+	your
+	z
+	za

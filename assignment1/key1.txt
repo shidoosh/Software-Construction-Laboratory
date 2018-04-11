@@ -1,0 +1,289 @@
+Name: Stefanie Shidoosh 
+UID: 804794484
+
+
+Exercise 1.1: Moving around Emacs
+1. Use Emacs to edit the file exer1.html.
+   $ emacs exer1.txt
+2. Move the cursor to just after the first occurrence of the word "HTML" (all upper-case).
+   C-s HTML
+   Enter
+3. Now move the cursor to the start of the first later occurrence of the word "scavenger".
+   C-s scav 
+   Enter
+   M-b
+4. Now move the cursor to the start of the first later occurrence of the word "self-referential".
+   C-s self-
+   Enter 
+   M-b
+5. Now move the cursor to the start of the first later occurrence of the word "arrow".
+   C-s arro 
+   Enter
+   M-b
+6. Now move the cursor to the end of the current line.
+   C-e
+7. Now move the cursor to the beginning of the current line.
+   C-a
+8. Doing the above tasks with the arrow keys takes many keystrokes, or it involves holding down keys for a long time. 
+Can you think of a way to do it with fewer keystrokes by using some of the commands available in Emacs?
+   Using emacs command C-s (incremental search) facilitates this process. 
+   In addition, we can use commands like M-b, M-f M-<, M->, C-e, and C-a to further help navigate. 
+9. Did you move the cursor using the arrow keys? 
+If so, repeat the above steps, without using the arrow keys.
+   I did not use the arrow keys. 
+10. When you are done, exit Emacs.
+   C-x C-c
+
+Exercise 1.2: Deleting text in Emacs
+1. Use Emacs to edit the file exer2.html. The idea is to delete its HTML comments; 
+the resulting page should display the same text as the original.
+   $ emacs exer2.html
+2. Delete the 18th line, which is an HTML comment. <!-- HTML comments look like this. -->
+   C-u 18 M-g g C-k
+	M-g g takes a prefix argument. To give an argument, we need C-u. C-k kills the line. 
+3. Delete the HTML comment containing the text "DELETE-ME DELETE-ME DELETE-ME".
+   C-s DELETE-ME DELETE-ME DELETE-ME
+   Enter
+   C-a
+   C-k
+4. Delete the HTML comment containing the text "https://en.wikipedia.org/wiki/HTML_comment#Comments".
+   C-s https://en.wikipedia.org/wiki/HTML_comment#Comments
+   Enter
+   C-s C-s
+   Enter
+   C-a
+   C-p
+   C-k (~6 times)
+5. There are three more HTML comments; delete them too.
+  
+   C-s <!
+   Enter
+   C-M-k 
+   Backspace Backspace
+
+   C-s C-s
+   Enter
+   C-u 4 C-k
+   Backspace Backspace
+   
+   C-s C-s
+   Enter
+   C-a
+   C-k
+   
+   C-x
+   C-s
+
+   $ diff exer1.html exer2.html
+   $ diff -u exer1.html exer2.html >exer2.diff
+
+Exercise 1.3: Inserting text in Emacs
+1. Use Emacs to edit the file exer3.html.
+   emacs exer3.html
+2. Change the first two instances of "Assignment 1" to "Assignment 51"
+   C-s Assign
+   Enter
+   M-f M-f 
+   Backspace 
+   51
+
+   C-s C-s
+   Enter
+   M-f M-f
+   Backspace
+   51
+
+3. Change the first instance of "UTF-8" to "US-ASCII".
+   M-<
+   C-s 8
+   Enter
+   Backspace Backspace Backspace Backspace
+   S-ASCII
+4. Insert an empty line after the first line containing "</ol>".
+   M-<
+   C-s </ol>
+   Enter
+   C-o
+5. When you finish, save the text file and exit Emacs. 
+As before, use the diff command to check your work.
+   C-x 
+   C-s
+   yes
+   $ diff exer1.html exer3.html
+   $ diff -u exer1.html exer2.html >exer2.diff
+
+Exercise 1.4: Other Editing Tasks in Emacs
+1. Execute the command "cat exer2.html exer2.diff >exer4.html" to create a file exer4.html 
+that contains a copy of exer2.html followed by a copy of exer2.diff.
+   $ cat exer2.html exer2.diff >exer4.html
+2. Use Emacs to edit the file exer4.html. 
+The idea is to edit the file so that it looks identical to exer1.html on a browser, 
+but the file itself is a little bit different internally.
+   $ emacs exer4.html
+3. Go to the end of the file. Copy the new lines in the last chunk of diff output, 
+and paste them into the correct location earlier in the file.
+   M->
+   C-r -<
+   C-f
+   C-@
+   C-e
+   M-w
+   M-<
+   C-s </html>
+   Enter
+   C-n
+   C-y
+
+
+4. Repeat the process, until the earlier part of the file is identical to what was in the original.
+   M->
+   C-r -<!
+   C-r
+   C-f
+   C-n C-n C-n 
+   C-e
+   M-w
+
+   C-r lines.
+   C-n
+   C-y
+   C-b C-b C-b 
+   Backspace
+   C-p
+   C-f
+   Backspace
+   C-p
+   C-f
+   Backspace
+
+   C-r lines.
+   C-r 
+   C-e
+   C-b C-b C-b C-b C-b
+   
+   …and so on and so forth: Searching the comment, mark set the text, search for line location (where it belongs in the original), yank, delete extra ‘-‘ characters. 
+
+
+5. Delete the last part of the file, which contains the diff output.
+   M-< 
+   C-s —-
+   Enter
+   C-a
+   C-@
+   M->
+   C-w
+6. … except we didn't really want to do that, so undo the deletion.
+   C-x u
+7. Turn the diff output into a comment, by surrounding it with "<!--" and "-->".
+   C-s </html>
+   Enter
+   C-n
+   C-a
+   C-n
+   <!- -
+   M->
+   - - > 
+
+8. Now let's try some search and replaces. Search the text document for the pattern "<ol>".
+How many instances did you find? Use the search and replace function to replace them all with the final-caps equivalent "<oL>".
+   C-s <ol> 
+   Enter
+   C-s C-s C-s C-s C-s C-s
+   Enter
+   7 instances of <ol>. 
+   M-x replace-string 
+   <ol> Enter
+   <oL> Enter
+
+9. Check your work with viewing exer4.html with an HTML browser, 
+and by running the shell command "diff -u exer1.html exer4.html >exer4.diff". 
+The only differences should be changes from "<ol>" to "<oL>", and a long HTML comment at the end.
+   C-x 
+   C-s
+   C-x 
+   C-c
+   $ diff -u exer1.html exer4.html >exer4.diff
+   
+
+Exercise 1.5: Doing commands in Emacs
+1. Create a new directory named "junk" that's right under your home directory.
+   $ emacs
+   M-x make-directory
+   junk
+
+2.In that directory, create a C source file hello.c
+   C-x C-f ~/junk/hello.c 
+   …typed program…
+   C-x C-s
+3. Compile this file, using the Emacs M-x compile command.
+   M-x compile enter (delete make -k) gcc ~/junk/hello.c
+4. Run the compiled program, and put its output into a new Emacs buffer named hello-out.
+   $ mv a.out hello.out
+   $ emacs
+   C-x b hello-out
+   M-! ./hello.out
+5. Copy this buffer's contents directly into the log that you're maintaining for this exercise
+   $ emacs key1.txt
+   C-x 0
+   C-@
+   M->
+   M-w
+   C-x d 
+   ~/key1.txt
+   C-y
+   #include <stdio.h>
+int
+main (void)
+{
+  char n = '\n';
+  char b = '\\';
+  char q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn';
+%c  char b = '%c%c';%c  char q = '%c';%c  char const *p = %c%s%c;
+%c  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);%c  return 0;%c}%c";
+  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);
+  return 0;
+}
+
+
+Exercise 1.6: Running Elisp code
+1. Visit Emacs's *scratch* buffer
+   $ emacs
+   C-x b
+   Enter
+2. In the buffer, compute a random integer by invoking the random function. 
+Use C-j (eval-print-last-sexp) to invoke the random function.
+   (random) C-j
+3. In the buffer, assign two random integers to the global variables x and y. 
+You can start by executing (setq x (random)). Again, use C-j.
+   (setq x (random)) C-j
+     1995201113327865807
+   (setq y(random)) C-j
+    -1107816661196757949
+4. (- x y) C-j
+    x>y
+   -1508668243902764148
+   An incorrect output. 
+5. Try evaluating (- x y) again, but this time with M-: (eval-expression). 
+What difference do you observe in the output?
+   M-:
+   (-x y)
+   -1508668243902764148 (#o254201043466620665614, #x2b102239b6436b8c)
+   Same output as in exercise 4. 
+6. Are the two random integers truly random in the mathematical sense? If not, what's not random about them?
+   
+	The numbers generated are pseudo-random (hence, not truly random in the mathematical sense,
+   	since a deterministic program cannot do this). 
+   	Starting from a seed, the random function always generates the same sequence of numbers. 
+   	However, they do have random properties such that each number in the series is generated equally as often. 
+   	It’s worth nothing that truly random numbers would make debugging a program that utilizes randomization impossible. 
+   	Thus, the implementation of pseudo-random fits our purposes best, relative to truly random generation of numerical values. 
+
+7. Assuming (random) is truly random, what is the probability 
+   that the two-variable difference mentioned above is mathematically incorrect? Explain how you calculated this.
+   There is a significantly high probability that two-variable difference will be incorrect. 
+
+   	This invalidity is due to how the TRULY random numbers are generated, 
+   	such that there are an infinite numbers that are greater than most-postive-fixnum and most-negative-fixnum.    
+   	Any time one of these numbers outside of the range between most-postive-fixnum and most-negative-fixnum will cause overflow, 
+   	and therefore the incorrect answer. 

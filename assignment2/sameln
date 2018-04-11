@@ -1,0 +1,53 @@
+#!/bin/sh
+#turn off wildcard expansion
+set -f    
+export LC_COLLATE='C' #guarantees lexicographically
+dir=$1 
+IFS=$'\n' #Internal Field Separator
+D=`ls -a $dir | sort`
+readable=1
+let count=0
+FILES= #THIS IS A NULL STRING, NOT AN ARRAY! POSIX COMPATIBLE.
+for file in $D
+do
+	if [ ! -d "$dir/$file" ] && [ ! -L "$dir/$file" ] #guarantee "regular" files
+	then
+		if [ ! -r "$dir/$file" ] && [ -f "$dir/$file" ] 
+		then	
+			#error message if file is not readable to the user
+			echo "$dir/$file is not readable"
+			readable=0
+		fi
+
+		if [ $readable = 1 ] && [ "$file" != . ] && [ "$file" != .. ]
+       		then
+			if [ -z "$FILES" ] #first entered file
+			then
+				FILES="$dir/$file"
+			else 		  #files to be separated by new line
+				FILES+=$'\n'
+				FILES+="$dir/$file"
+			fi
+			count=`expr $count + 1`
+			if [ $count -gt 1 ] #files have been entered, so we can compare
+			then
+			for each in $FILES
+			do
+  				refFile=$each #what file I am referring to
+				cmp -s "$refFile" "$dir/$file"
+				if [ $? -eq 0 ] && [ "$refFile" != "$dir/$file" ] 
+				then 
+					#files have same contents and are not the same file, link
+					rm "$dir/$file"
+					ln "$refFile" "$dir/$file"
+					break
+				else
+					continue
+				fi 
+			done
+			fi         	        
+		fi	
+	fi
+done
+set +f
+#reinstate wildcard expansion 

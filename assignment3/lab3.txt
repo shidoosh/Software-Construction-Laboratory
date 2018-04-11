@@ -1,0 +1,148 @@
+Name: Stefanie Shidoosh
+UID: 804794484
+
+$ export LC_ALL='en_US.UTF-8'
+
+1. Grab Coreutils 7.6
+	To install coreutils-7.6.tar.gz
+		$ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+	Untar coreutils-7.6.tar.gz tarball
+		$ tar -xvzf coreutils-7.6.tar.gz 
+	Go inside newly created coreutils-7.6 directory 
+		$ cd coreutils-7.6/
+
+2. Compile and install your copy of Coreutils 
+into a temporary directory of your own. Note any problems you run into.
+	Configure, make, make install:
+	Create directory in my home directory: 
+		$ mkdir coreutilsInstall
+	To configure, need to specify absolute path 
+	to a directory we have permissions for, 
+	rather than the default server
+		$ ./configure --prefix=/u/eng/class/classesh/coreutilsInstall
+	To compile files, determine automatically which pieces of a 
+	large program need to be recompiled, 
+	and issue the commands to recompile them
+	which is useful for when we apply the patch. 
+		$ make
+	Install to coreutilsInstall due to prefix modification 
+	in configure step 
+		$ make install
+	I did not run into any problems. 
+
+3. Reproduce the bug on your machine with the unmodified version of coreutils.
+	I set LC_ALL='en_US.UTF-8' in the beginning of lab, 
+	so locale is situated correctly to reveal the bug. 
+	To get see buggy behavior of coreutils-7.6 ls -l command:
+		$ cd coreutilsInstall  
+	We need to be in bin because this is where ls source code is located
+		$ cd bin 
+	We need ./ls -l to indicate we want coreutils-7.6 version of ls, 
+	rather than SEASnet usr/bin version. 
+		$ ./ls -l base64
+		>> -rwxr-xr-x 1 classesh class 119472 2018-01-30 10:45 base64
+	We see the bug here, with the YYYY-MM-DD date 
+	displayed instead of traditional Unix date. 
+
+4. Use Emacs or Vim to apply Brady's patch.
+	In coreutils-7.6: 
+		$ cd coreutils-7.6
+		$ vim patch.txt
+	in patch.txt
+diff --git a/src/ls.c b/src/ls.c
+index 1bb6873..4531b94 100644
+--- a/src/ls.c
++++ b/src/ls.c
+@@ -2014,7 +2014,6 @@ decode_switches (int argc, char **argv)
+             break;
+ 
+           case long_iso_time_style:
+-          case_long_iso_time_style:
+             long_time_format[0] = long_time_format[1] = "%Y-%m-%d %H:%M";
+             break;
+ 
+@@ -2030,13 +2029,8 @@ decode_switches (int argc, char **argv)
+                    formats.  If not, fall back on long-iso format.  */
+                 int i;
+                 for (i = 0; i < 2; i++)
+-                  {
+-                    char const *locale_format =
+-                      dcgettext (NULL, long_time_format[i], LC_TIME);
+-                    if (locale_format == long_time_format[i])
+-                      goto case_long_iso_time_style;
+-                    long_time_format[i] = locale_format;
+-                  }
++                  long_time_format[i] =
++                    dcgettext (NULL, long_time_format[i], LC_TIME);
+               }
+           }
+       /* Note we leave %5b etc. alone so user widths/flags are honored.  */
+-- 
+1.6.2.5
+
+	Using 1 for pnum because it corresponds to depth of path. 
+	In this point in time, 
+	I ran the command in coreutils-7.6 directory, 
+	therefore 1 is be correct argument 
+	because source directory within coreutils-7.6 directory. 
+		$ patch -p1 < patch.txt
+		>> patching file src/ls.c
+		   Hunk #1 succeeded at 2013 (offset -1 lines).
+		   Hunk #2 succeeded at 2028 (offset -1 lines).
+
+5. Type the command make at the top level of your source tree, 
+so that you build (but do not install) the fixed version. 
+For each command that gets executed, 
+explain why it needed to be executed (or say that it wasn't neeeded).
+In coreutils-7.6: 
+		$ cd coreutils-7.6
+	As mentioned before, make will consider the changes made, 
+	i.e. the patch, and will recompile accordingly. 
+		$ make
+	make install was not needed because 
+	I do not want to overwrite buggy ls executable 
+
+6. Make sure your change fixes the bug, by testing that the modified ls works 
+on your test case and that the installed ls doesn't. 
+Test on a file that has been recently modified, 
+and on a file that is at least a year old.
+In coreutils-7.6: 
+		$ cd coreutils-7.6
+	running patched binary
+		$ ./src/ls -l
+		>> -rw-r--r--  1 classesh class   80541 Sep 18  2008 ABOUT-NLS
+	The patch was applied!
+In coreutilsInstall directory: 
+		$ cd coreutilsInstall
+	running unpatched, buggy binary to show 
+	old ls still does not work properly: 
+		$ ./bin/ls -l
+	>> drwxr-xr-x 2 classesh class 8192 2018-01-30 10:45 bin
+	   drwxr-xr-x 3 classesh class 4096 2018-01-30 10:45 lib
+	   drwxr-xr-x 5 classesh class 4096 2018-01-30 10:45 share
+	Comparing recently modified files and old files, 
+	use touch command with option -t to set modify date 
+		$ touch -t 201504100959.30 old
+		$ touch -t 201801291120.30 recent
+	running unpatched, buggy binary:
+		$ ./bin/ls -l
+	>> -rw-r--r-- 1 classesh class    0 2015-04-10 09:59 old
+	   -rw-r--r-- 1 classesh class    0 2018-01-29 11:20 recent
+   
+	running patched binary:
+		$ ../coreutils-7.6/src/ls -l
+	>> -rw-r--r-- 1 classesh class    0 Apr 10  2015 old
+   	   -rw-r--r-- 1 classesh class    0 Jan 29 11:20 recent
+	The difference between running ls 
+	with a new file and with a file older than 1 year is as follows: 
+	Old file: 
+	With patch, ls -l only lists month, date, and year, 
+	whereas without patch, it lists year, month, date, AND time. 
+	Recent file (modified within the year): 
+	With patch, ls -l only lists month, date, and time, 
+	whereas without patch, it lists it lists month, date, time AND year.
+	For both cases, the format with unpatched is YYYY-MM-DD TIME, 
+	and the format with patch is MMM DD TIME/YEAR, 
+	depending on if it is newer file or old file, respectively. 
+
+
