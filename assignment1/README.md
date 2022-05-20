@@ -67,7 +67,7 @@ Delete the last part of the file, which contains the diff output.
 … except we didn't really want to do that, so undo the deletion.
 Turn the diff output into a comment, by surrounding it with "<!--" and "-->".
 Now let's try some search and replaces. Search the text document for the pattern ol tag. How many instances did you find? Use the search and replace function to replace them all with the final-caps equivalent. 
-Check your work with viewing exer4.html with an HTML browser, and by running the shell command "diff -u exer1.html exer4.html >exer4.diff". The only differences should be changes from "<ol>" to "<oL>", and a long HTML comment at the end.
+Check your work with viewing exer4.html with an HTML browser, and by running the shell command "diff -u exer1.html exer4.html >exer4.diff". The only differences should be changes from ol tag to oL tag, and a long HTML comment at the end.
 # Exercise 1.5: Doing commands in Emacs
 Do these tasks all within Emacs. Don't use a shell subcommand if you can avoid it.
 
