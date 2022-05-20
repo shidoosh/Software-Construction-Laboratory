@@ -25,12 +25,12 @@ You nose around on the net, and discover that the problem is that the locale fil
 
 Try Brady's workaround, as follows:
 
-Grab Coreutils 7.6.
-Compile and install your copy of Coreutils into a temporary directory of your own. Note any problems you run into.
-Reproduce the bug on your machine with the unmodified version of coreutils. You may need to use the locale-gen program to generate the en_US.UTF-8 locale.
-Use Emacs or Vim to apply Brady's patch.
-Type the command make at the top level of your source tree, so that you build (but do not install) the fixed version. For each command that gets executed, explain why it needed to be executed (or say that it wasn't neeeded).
-Make sure your change fixes the bug, by testing that the modified ls works on your test case and that the installed ls doesn't. Test on a file that has been recently modified, and on a file that is at least a year old. You can use the touch command to artficially mark a file as being a year old.
+1. Grab Coreutils 7.6.
+2. Compile and install your copy of Coreutils into a temporary directory of your own. Note any problems you run into.
+3. Reproduce the bug on your machine with the unmodified version of coreutils. You may need to use the locale-gen program to generate the en_US.UTF-8 locale.
+4. Use Emacs or Vim to apply Brady's patch.
+5. Type the command make at the top level of your source tree, so that you build (but do not install) the fixed version. For each command that gets executed, explain why it needed to be executed (or say that it wasn't neeeded).
+6. Make sure your change fixes the bug, by testing that the modified ls works on your test case and that the installed ls doesn't. Test on a file that has been recently modified, and on a file that is at least a year old. You can use the touch command to artficially mark a file as being a year old.
 
 Q1. Why did Brady's patch remove the line "case_long_iso_time_style:"? Was it necessary to remove that line? Explain.
 
