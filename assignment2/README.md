@@ -11,12 +11,13 @@ We also assume the file words contains a sorted list of English words. Create su
 
 Then, take a text file containing the HTML in this assignment's web page, and run the following commands with that text file being standard input. Describe generally what each command outputs (in particular, how its output differs from that of the previous command), and why.
 
-tr -c 'A-Za-z' '[\n*]'
-tr -cs 'A-Za-z' '[\n*]'
-tr -cs 'A-Za-z' '[\n*]' | sort
-tr -cs 'A-Za-z' '[\n*]' | sort -u
-tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
-tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+* tr -c 'A-Za-z' '[\n*]'
+* tr -cs 'A-Za-z' '[\n*]'
+* tr -cs 'A-Za-z' '[\n*]' | sort
+* tr -cs 'A-Za-z' '[\n*]' | sort -u
+* tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+* tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+
 Let's take the last command as the crude implementation of an English spelling checker. Suppose we want to change it to be a spelling checker for Hawaiian, a language whose traditional orthography has only the following letters (or their capitalized equivalents):
 
 p k ' m n w l h a e i o u
