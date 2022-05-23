@@ -6,6 +6,6 @@ This repo contains the coursework for UCLA's CS 35L course taught by Paul Eggert
 * Change Management
 * Low-level construction and debugging with C 
 * Systems programming 
-* Faults, failutes, errors, and holes 
+* Faults, failures, errors, and holes 
 * Security basics 
 * Paralellism 
