@@ -1,28 +1,79 @@
-# Assignment 7. SSH setup and use in applications
-Hardware prerequisite
-For this assignment you will need a Seeed Studio BeagleBone Green Wireless Development Board. You may wish to get the higher-priced Seeed Studio BeagleBone Green Wireless IOT Kit, as this is a superset of the basic unit needed for 35L, and is used by CS 111 this quarter (and likely in later quarters, though this is not guaranteed). These units are available from Seeed, Amazon, Digi-Key, Mouser Electronics, Verical, and other sources.
+# Assignment 4. C programming and debugging
 
-## Laboratory
-When you initially set up your host in the lab, you will be running an operating system, and will be able to connect to the outside world, but you won't be able to connect to the hosts of the other students in the class except in trivial ways. What you'd like to do is to be able to run processes on the other students' hosts. For example, you'd like to be able to log into a neighbor's host, and run a program there that displays on your host.
+## Laboratory: Debugging a C program
+As usual, keep a log in the file lab4.txt of what you do in the lab so that you can reproduce the results later. This should not merely be a transcript of what you typed: it should be more like a true lab notebook, in which you briefly note down what you did and what happened.
 
-To do that, you need to set up an account on your neighbor's host, and vice versa so that your neighbor can log into your host and do the same. Unfortunately, the obvious ways to do that involve an initial step that exchanges passwords over the Internet in the clear. We'd like to avoid that.
+You're helping to maintain an old stable version of coreutils, but that version has a bug in its implementation of the ls program. (Actually, it has two bad bugs, but for now we'll just look at the first one.)
 
-In this laboratory, the class will divide into teams. Your team will assume that the other teams have all tapped the network connection and can observe the contents of all the packets going back and forth among all your team's computers. Your job is to set up your computers so that you can log into each other's hosts, without letting the other teams into your hosts.
+The bug is that ls -t mishandles files whose time stamps are very far in the past. It seems to act as if they are in the future. For example:
 
-Do not try to actually break into the other team's hosts; this is an exercise in defense, not offense!
+$ tmp=$(mktemp -d)
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 eggert csfac 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 eggert csfac 0 2017-01-25 00:11:55.528846902 +0000 now1
+-rw-r--r-- 1 eggert csfac 0 2017-01-25 00:11:54.524820127 +0000 now
+$ cd
+$ rm -fr $tmp
+Build this old version of coreutils as-is, and then again with this renaming patch. What problems did you have when building it as-is, and why did the renaming patch fix them?
 
-Use OpenSSH to establish trusted connections among your teams' hosts. You want to make your logins convenient, so you should use ssh-agent on your host to manage authentication. That is, you should be able to log out of your host (dropping all your connections to the outside world), then log back in, type your passphrase once to ssh-agent, and then be able to use ssh to connect to any of your colleagues' hosts, without typing any passwords or passphrases.
+Reproduce the problem. Use a debugger to figure out what went wrong and to fix the corresponding source file.
 
-You should also use port forwarding so that you can run a command on a remote host that displays on your host. For example, you should be able to log into a remote host, type the command xterm, and get a shell window on your host.
+Construct a new patch file lab4.diff containing your coreutils fixes, in the form of a ChangeLog entry followed by a diff -u patch.
 
-Keep a log of every step you personally took during the laboratory to configure your or your team members' hosts, and what the results of the step were. The idea behind recording your steps is that you should be able to reproduce your work later, if need be.
+Also, try to reproduce the problem in your home directory on the SEASnet Linux servers, instead of using the $tmp directory. When running the above test case, use the already-installed touch and ls utilities instead of the old version of coreutils. How well does SEASnet do?
 
-## Homework
-Use GNU Privacy Guard's shell commands to create a key pair. Export the public key, in ASCII format, into a file hw-pubkey.asc. Use this key to create a detached signature for your submission so that the commands described below can successfully verify it.
+## Homework: Sorting encrypted text
+The basic idea is that we want to sort encoded data without decoding and encoding it. That is, our input is an encoded file, and we could compute the output by decoding the input, sorting the decoded data, and then encoding the resulting output—except that we do not want to encode or decode anything.
 
-If you are creating a key pair on the SEASnet GNU/Linux servers, you may exhaust its entropy pool as described in Launchpad bug 706011. The symptom will be a diagnostic saying "It is a good idea to perform some other action (type on the keyboard, move the mouse, utilize the disks) during the prime generation; this gives the random number generator a better chance to gain enough entropy." Since you can't use the keyboard or mouse on the SEASnet servers, you'll have to use the disks, for example, by using the find command to copy every readable file to /dev/null; this is something that you can do in another session that is logged into the same machine. Please remember to interrupt the find once the key pair is generated, so that you don't tie up the server unnecessarily.
+Write a C function frobcmp that takes two arguments a and b as input and returns an int result that is negative, zero, or positive depending on whether a is less than, equal to, or greater than b. Each argument is of type char const *, and each points to an array of non-space bytes that is followed by space byte. Use standard byte-by-byte lexicographic comparison on the non-space bytes, in the style of the memcmp function, except that you should assume that both arrays are frobnicated, (i.e., trivally encoded via memfrob) and should return the equivalent of running memcmp on the corresponding unfrobnicated arrays. If one unfrobnicated array is a prefix of the other, then consider the shorter to be less than the longer. The space bytes are not considered to be part of either array, so they do not participate in the comparison.
 
-Briefly answer the following questions.
+For example, frobcmp ("*{_CIA\030\031 ", "*`_GZY\v ") should return a positive int because "*{_CIA\030\031" is "\0Quick23" frobnicated and "*`_GZY\v" is "\0Jumps!" frobnicated, and "\0Quick23" is greater than "\0Jumps!" in the ASCII collating sequence. As the example demonstrates, null bytes '\0' are allowed in the byte arrays and do contribute to the comparison.
 
-Suppose the other teams really had been observing all the bytes going across the network. Is your resulting network still secure? If so, explain why, and explain whether your answer would change if (1) you assumed the other teams had also tapped your keyboards and had observed all of your team's keystrokes, or (2) you are booting off USB and you assume the other teams temporarily had physical control of the USB. If not, explain any weaknesses of your team's setups, focusing on possible attacks by such outside observers.
-Explain why the gpg --verify command in the following instructions doesn't really verify that you personally created the tar file in question. How would you go about fixing this problem?
+Your implementation should not invoke memfrob, as that would mean that memory would temporarily contain a copy of the unfrobnicated data. Instead, it should look only at frobnicated bytes one at a time, and unfrobnicate them "by hand", so to speak.
+
+Use your C function to write a program sfrob that reads frobnicated text lines from standard input, and writes a sorted version to standard output in frobnicated form. Frobnicated text lines consist of a series of non-space bytes followed by a single space; the spaces represent newlines in the original text. Your program should do all the sorting work itself, by calling frobcmp. If standard input ends in a partial record that does not have a trailing space, your program should behave as if a space were appended to the input.
+
+Use <stdio.h> functions to do I/O. Use malloc, realloc and free to allocate enough storage to hold all the input, and use qsort to sort the data. Do not assume that the input file is not growing: some other process may be appending to it while you're reading, and your program should continue to read until it reaches end of file. For example, your program should work on the file /proc/self/status, a "file" that is constantly mutating: it always appears to be of size 0 when you ls it, but it always contains nonempty contents if you read it. You should make sure your program works on empty files, as well as on files that are relatively large, such as /usr/local/cs/jdk*/jre/lib/rt.jar on SEASnet.
+
+If the program encounters an error of any kind (including input, output or memory allocation failures, it should report the error to stderr and exit with status 1; otherwise, the program should succeed and exit with status 0. The program need not report stderr output errors.
+
+For example, the shell command:
+
+printf '*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4' |
+./sfrob |
+od -ta
+should output:
+
+0000000   *   h   X   E   ]   D  sp   *   {   _   C   I   A  sp   *   ~
+0000020   B   O  sp   *   L   E   R  sp   #   N   E   M eot  sp   #   @
+0000040   _   G   Z   Y  sp   #   F   K   P   S  sp   #   E   \   O   X
+0000060  sp   #   ^   B   O  sp
+0000066
+because frobnicating sfrob's input and then appending a trailing newline (because the last frobnicated byte is not a newline) yields:
+
+^@The
+^@Quick
+^@Brown
+^@fox
+^Ijumps
+^Iover
+^Ithe
+^Ilazy
+^Idog.
+where ^@ denotes a null byte '\0', and ^I denotes a tab byte '\t'. Sorting this yields:
+
+^@Brown
+^@Quick
+^@The
+^@fox
+^Idog.
+^Ijumps
+^Ilazy
+^Iover
+^Ithe
+and frobnicating this yields the output shown above.
