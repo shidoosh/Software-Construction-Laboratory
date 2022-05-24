@@ -9,5 +9,5 @@ This repo contains the coursework for UCLA's CS 35L course taught by Paul Eggert
 * Faults, failures, errors, and holes 
 * Security basics 
 * Paralellism 
-* 
+
 http://web.cs.ucla.edu/classes/winter18/cs35L/
